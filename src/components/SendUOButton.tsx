@@ -2,16 +2,38 @@ import {
     useSendUserOperation,
     useSmartAccountClient,
   } from "@alchemy/aa-alchemy/react";
+
   import { useState } from "react";
   import { Address } from "viem";
   import { arbitrumSepolia } from "viem/chains";
   import { encodeFunctionData } from "viem";
+import { AnyARecord } from "dns";
   export const SendUOButton = () => {
+
+  
+    const { client } = useSmartAccountClient({
+      type: "MultiOwnerModularAccount",
+      gasManagerConfig: {
+        policyId: process.env.NEXT_PUBLIC_ALCHEMY_GAS_MANAGER_POLICY_ID!,
+      },
+      opts: {
+        txMaxRetries: 20,
+      },
+    });
+    const {
+      sendUserOperation,
+      sendUserOperationResult,
+      isSendingUserOperation,
+      error: isSendUserOperationError,
+    } = useSendUserOperation({ client, waitForTxn: true });
+
     const [nftAddrs] = useState<Address>(
       "0xC5E243B7D31a485bae22Aa4039D71BeE14E2f387"
     );
+    const user: Address = client?.account.address;
 
-    const [userAddr] = useState<Address>("0x3c4817d27f2550FA14f6F5aC729B96aC262F2C11");
+    const [userAddr] = useState<Address>(user);
+    console.log(userAddr);
 
     const abi = [
       {
@@ -604,24 +626,6 @@ import {
         "ipfs://QmS2euNKfsqAwZJwHoXrbjHvYCFsNZunBtW2vpgDfZasTa",
       ]
     })
-
-    
-  
-    const { client } = useSmartAccountClient({
-      type: "MultiOwnerModularAccount",
-      gasManagerConfig: {
-        policyId: process.env.NEXT_PUBLIC_ALCHEMY_GAS_MANAGER_POLICY_ID!,
-      },
-      opts: {
-        txMaxRetries: 20,
-      },
-    });
-    const {
-      sendUserOperation,
-      sendUserOperationResult,
-      isSendingUserOperation,
-      error: isSendUserOperationError,
-    } = useSendUserOperation({ client, waitForTxn: true });
   
     return (
       <div className="flex flex-col">
